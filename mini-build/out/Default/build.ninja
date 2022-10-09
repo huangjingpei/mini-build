@@ -1,0 +1,38 @@
+ninja_required_version = 1.7.2
+
+rule gn
+  command = ../../buildtools/linux64/gn --root=../.. -q --regeneration gen .
+  pool = console
+  description = Regenerating ninja files
+
+build build.ninja: gn
+  generator = 1
+  depfile = build.ninja.d
+
+pool build_toolchain_action_pool
+  depth = 8
+
+pool build_toolchain_link_pool
+  depth = 1
+
+subninja toolchain.ninja
+
+build poison_audio_codecs: phony obj/poison_audio_codecs.stamp
+build poison_default_echo_detector: phony obj/poison_default_echo_detector.stamp
+build poison_default_task_queue: phony obj/poison_default_task_queue.stamp
+build poison_rtc_json: phony obj/poison_rtc_json.stamp
+build poison_software_video_codecs: phony obj/poison_software_video_codecs.stamp
+build $:poison_audio_codecs: phony obj/poison_audio_codecs.stamp
+build $:poison_default_echo_detector: phony obj/poison_default_echo_detector.stamp
+build $:poison_default_task_queue: phony obj/poison_default_task_queue.stamp
+build $:poison_rtc_json: phony obj/poison_rtc_json.stamp
+build $:poison_software_video_codecs: phony obj/poison_software_video_codecs.stamp
+
+build all: phony $
+    obj/poison_audio_codecs.stamp $
+    obj/poison_default_echo_detector.stamp $
+    obj/poison_default_task_queue.stamp $
+    obj/poison_rtc_json.stamp $
+    obj/poison_software_video_codecs.stamp
+
+default all
